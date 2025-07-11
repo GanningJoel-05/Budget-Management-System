@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome | Expense Tracker</title>
+  <link rel="stylesheet" href="welcome.css" />
+</head>
+<body>
+  <div class="welcome-container">
+    <div class="content">
+      
+      <img src="https://play-lh.googleusercontent.com/1iukd3WQv6HTWfLQeWiXlqgYaCG89LVy7jLI7lB1LWv0gdV42WMKLRhMPY1OR-2egI8" alt="Expense Tracker Icon" class="logo-img" />
+    
+      <h1>Welcome to the Budget Mangement System</h1>
+      <p>Track your Expenses, Manage Budgets, and Achieve your Financial Goals!</p>
+      
+      <button id="getStartedBtn">Get Started</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("getStartedBtn").addEventListener("click", () => {
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

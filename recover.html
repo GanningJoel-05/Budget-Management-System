@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password | Expense Tracker</title>
+  <link rel="stylesheet" href="recover.css" />
+</head>
+<body>
+  <div class="register-box">
+    <div class="avatar"></div>
+    <h2>Reset Password</h2>
+    <form id="resetForm">
+      <div class="input-group">
+        <input type="password" id="newPassword" required />
+        <label>New Password</label>
+      </div>
+      <div class="input-group">
+        <input type="password" id="confirmPassword" required />
+        <label>Confirm Password</label>
+      </div>
+      <button type="submit">Reset Password</button>
+      <p id="error" class="error-message"></p>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("resetForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const password = document.getElementById("newPassword").value.trim();
+      const confirm = document.getElementById("confirmPassword").value.trim();
+      const email = localStorage.getItem("recoveryEmail");
+      const error = document.getElementById("error");
+      error.textContent = "";
+
+      if (!password || !confirm) {
+        error.textContent = "All fields are required.";
+        return;
+      }
+
+      if (password !== confirm) {
+        error.textContent = "Passwords do not match.";
+        return;
+      }
+
+      fetch("http://localhost:8080/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      })
+      .then(res => res.ok ? res.text() : Promise.reject("Reset failed"))
+      .then(message => {
+        alert(message);
+        localStorage.removeItem("recoveryEmail");
+        window.location.href = "login.html";
+      })
+      .catch(err => {
+        error.textContent = err;
+      });
+    });
+  </script>
+</body>
+</html>

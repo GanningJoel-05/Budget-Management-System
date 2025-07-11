@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Forgot Password</title>
+        <link rel="stylesheet" href="forgot.css" />
+    </head>
+    <body>
+        
+        <div class="register-box">
+            <div class="avatar"></div>
+            <h2>Forgot Password</h2>
+            <form id="forgotForm">
+                <div class="input-group">
+                    <input type="email" id="email" required />
+                    <label>Enter the Registered Email</label>
+                </div>
+                <button type="submit">Continue</button>
+                <p id="error" class="error-message"></p>
+            </form>
+        </div>
+        
+        <script>
+        const forgotForm = document.getElementById("forgotForm");
+        const error = document.getElementById("error");
+
+        forgotForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            
+        const email = document.getElementById("email").value.trim();
+        error.textContent = "";
+        
+        if (!email) {
+            error.textContent = "Email is required.";
+            return;
+        }
+        
+        fetch("http://localhost:8080/api/verify-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        })
+
+        .then(res => res.ok ? res.text() : Promise.reject("Email not found."))
+        .then(msg => {
+            alert(msg || "Email verified.");
+            localStorage.setItem("recoveryEmail", email);
+            window.location.href = "recover.html";
+        })
+        
+        .catch(err => {
+            error.textContent = err;
+        });
+        });
+        </script>
+        </body>
+        </html>

@@ -1,0 +1,81 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+  color: #fff;
+  animation: fadeIn 1s ease-in;
+  background: linear-gradient(135deg, #0f172a, #001e2b, #001f3f, #011627);
+  background-size: 400% 400%;
+  animation: neonGlow 15s ease infinite;
+}
+
+@keyframes neonGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.welcome-container {
+  text-align: center;
+  padding: 40px;
+  max-width: 500px;
+}
+
+.logo-img {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 30px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+h1 .neon {
+  color: #fdffff;
+}
+
+p {
+  font-size: 16px;
+  margin-bottom: 30px;
+  color: #cccccc;
+  opacity: 0.9;
+}
+
+button {
+  padding: 12px 30px;
+  font-size: 16px;
+  border: none;
+  border-radius: 25px;
+  background: #00ffe5;
+  color: #121111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1affff;
+  transform: scale(1.05);
+}

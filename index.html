@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Budget Management</title>
+    <link rel="stylesheet" href="index.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">BUDGET MANAGEMENT</div>
+            <ul class="menu">
+                <li class="active-menu-item" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</li>
+                <li data-section="addExpense"><i class="fas fa-plus-circle"></i> Add Expense</li>
+                <li data-section="addIncome"><i class="fas fa-money-bill-alt"></i> Add Income</li>
+                <li data-section="expenseSummary"><i class="fas fa-chart-pie"></i> Expense Summary</li>
+                <li data-section="budgetGoals"><i class="fas fa-bullseye"></i> Budget & Goals</li>
+                <li data-section="settings"><i class="fas fa-cog"></i> Settings</li>
+                <li data-action="logout" class="logout-option"><i class="fas fa-sign-out-alt"></i><a href="login.html" id="logoutLink">Log out</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1>Dashboard</h1>
+                <div class="user-profile">
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User Avatar" />
+                    <span id="welcomeUser">Welcome User</span>
+                </div>
+            </header>
+
+            <section id="dashboard" class="content-section active">
+                <div class="dashboard-summary">
+                    <div class="summary-card total">
+                        <h3>Total Expenses</h3>
+                        <p id="totalAmount">₹0.00</p>
+                    </div>
+                    <div class="summary-card expenses">
+                        <h3>Number of Expenses</h3>
+                        <p id="numberOfExpenses">0</p>
+                    </div>
+                    <div class="summary-card first">
+                        <h3>First Expense Date</h3>
+                        <p id="firstExpenseDate">N/A</p>
+                    </div>
+                    <div class="summary-card last">
+                        <h3>Last Expense Date</h3>
+                        <p id="lastExpenseDate">N/A</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-container monthly-details">
+                        <h2>Monthly Details</h2>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                        <div id="monthlyAmountLabels" style="text-align: center; margin-top: 10px;"></div>
+                    </div>
+
+                    <div class="expense-summary-chart-section">
+                        <h2>Category Expenses</h2>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                        <p class="total-amount-large" id="dashboardTotalExpenses">₹0.00</p>
+                        <ul class="category-list" id="categoryExpenseList"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="addExpense" class="content-section">
+                <div class="form-section">
+                    <h2>Add New Expense</h2>
+                    <div class="form-group">
+                        <label for="expenseTitle">Title</label>
+                        <input type="text" id="expenseTitle" placeholder="e.g., Groceries" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseAmount">Amount</label>
+                        <input type="number" id="expenseAmount" step="0.01" placeholder="e.g., 50.75" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDate">Date</label>
+                        <input type="date" id="expenseDate" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseCategory">Category</label>
+                        <select id="expenseCategory" required>
+                            <option value="Food">Food</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Health">Health</option>
+                            <option value="Education">Education</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDescription">Description (Optional)</label>
+                        <textarea id="expenseDescription" rows="3" placeholder="Any specific notes..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="saveExpense">Add Expense</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="addIncome" class="content-section">
+                <div class="form-section">
+                    <h2>Add New Income</h2>
+                    <div class="form-group">
+                        <label for="incomeSource">Source</label>
+                        <input type="text" id="incomeSource" placeholder="e.g., Salary, Freelance" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeAmount">Amount</label>
+                        <input type="number" id="incomeAmount" step="0.01" placeholder="e.g., 2500.00" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeDate">Date</label>
+                        <input type="date" id="incomeDate" required />
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="saveIncome">Add Income</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="expenseSummary" class="content-section">
+                <div class="form-section">
+                    <h2>Your Financial Overview</h2>
+                    <div class="budget-goals-summary">
+                        <div class="summary-card total">
+                            <h3>Total Income</h3>
+                            <p id="summaryTotalIncome">₹0.00</p>
+                        </div>
+                        <div class="summary-card expenses">
+                            <h3>Total Expenses (Actual)</h3>
+                            <p id="summaryTotalExpensesActual">₹0.00</p>
+                        </div>
+                        <div class="summary-card first">
+                            <h3>Total Savings</h3>
+                            <p id="summarySavings">₹0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="budgetGoals" class="content-section">
+                <div class="form-section">
+                    <h2>Set Monthly Budget</h2>
+                    <div class="form-group">
+                        <label for="monthlyBudget">Set Monthly Budget Amount</label>
+                        <input type="number" id="monthlyBudget" step="0.01" placeholder="e.g., 2000.00" />
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="setBudget">Set Budget</button>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Current Budget Status</h2>
+                    <div class="budget-goals-summary">
+                        <div class="summary-card total">
+                            <h3>Monthly Income</h3>
+                            <p id="currentMonthlyIncome">₹0.00</p>
+                        </div>
+                        <div class="summary-card expenses">
+                            <h3>Monthly Expenses</h3>
+                            <p id="currentMonthlyExpenses">₹0.00</p>
+                        </div>
+                        <div class="summary-card first">
+                            <h3>Monthly Budget</h3>
+                            <p id="displayBudget">₹0.00</p>
+                        </div>
+                        <div class="summary-card last">
+                            <h3>Budget Remaining</h3>
+                            <p id="budgetRemaining">₹0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="settings" class="content-section">
+                <h2>User Settings</h2>
+                <div id="UserDetailsSection">
+                    <p><strong>Full Name:</strong> <span id="userFullName"></span></p>
+                    <p><strong>Username:</strong> <span id="userUsername"></span></p>
+                    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
