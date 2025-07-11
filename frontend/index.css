@@ -88,6 +88,8 @@ td{
     background-color: #f4f7f6; 
 }
 
+/* git remote add origin https://github.com/GanningJoel-05/budget-management-system.git */
+
 .header {
     display: flex;
     justify-content: space-between;
