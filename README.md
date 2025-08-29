@@ -26,7 +26,7 @@ To make it even better, I added **secure login**, **interactive charts**, and a 
 
 | Frontend | Backend | Database | Authentication | Tools |
 |----------|---------|----------|----------------|-------|
-| HTML, CSS, JavaScript | Spring Boot | PostgreSQL | JWT | Git, Postman |
+| HTML, CSS, JavaScript | Spring Boot | PostgreSQL | JWT | Git, GitHub, Postman, VSC |
 
 ---
 
