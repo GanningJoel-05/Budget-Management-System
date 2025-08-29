@@ -14,11 +14,11 @@ To make it even better, I added **secure login**, **interactive charts**, and a 
 
 ##  Features  
 
-- ** User Authentication** – Secure login and registration with **JWT** to keep user data safe.  
-- ** Income & Expense Tracking** – Add, view, and categorize transactions to spot spending patterns.  
-- ** Budget Planner** – Set monthly goals and track progress in real-time.  
-- ** Visual Analytics** – Dynamic charts (pie/bar) make numbers easy to understand at a glance.  
-- ** Responsive Design** – Works smoothly on both desktop and mobile.  
+- **User Authentication** – Secure login and registration with **JWT** to keep user data safe.  
+- **Income & Expense Tracking** – Add, view, and categorize transactions to spot spending patterns.  
+- **Budget Planner** – Set monthly goals and track progress in real-time.  
+- **Visual Analytics** – Dynamic charts (pie/bar) make numbers easy to understand at a glance.  
+- **Responsive Design** – Works smoothly on both desktop and mobile.  
 
 ---
 
