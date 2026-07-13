@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forgot Password | Budget Management</title>
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-icon">🔑</div>
+        <h1>Forgot Password</h1>
+        <p>Enter your email to verify your account</p>
+      </div>
+
+      <form id="forgotForm" novalidate>
+        <div class="field">
+          <label for="email">Registered Email</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="forgotBtn">
+          <span>Continue</span>
+        </button>
+
+        <p class="msg error" id="forgotMsg"></p>
+      </form>
+
+      <div class="auth-footer">
+        Remembered it? <a href="login.html">Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const btn   = document.getElementById('forgotBtn');
+      showMsg('forgotMsg', '');
+
+      if (!email) { showMsg('forgotMsg', 'Email is required.'); return; }
+
+      setLoading(btn, true);
+      try {
+        const res = await fetch(`${API}/verify-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (res.ok) {
+          localStorage.setItem('recoveryEmail', email);
+          showToast('Email verified! Redirecting…', 'success');
+          setTimeout(() => window.location.href = 'recover.html', 900);
+        } else {
+          showMsg('forgotMsg', 'Email not found. Please check and try again.');
+        }
+      } catch {
+        showMsg('forgotMsg', 'Cannot connect to server. Please try again.');
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

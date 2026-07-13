@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | Budget Management</title>
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-icon">💰</div>
+        <h1>Create Account</h1>
+        <p>Join and start managing your finances</p>
+      </div>
+
+      <form id="registerForm" novalidate>
+        <div class="field">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" placeholder="John Doe" autocomplete="name" />
+        </div>
+
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="field-pw">
+            <input type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password" />
+            <button type="button" class="pw-toggle" aria-label="Toggle password">👁</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="field-pw">
+            <input type="password" id="confirmPassword" placeholder="Re-enter password" autocomplete="new-password" />
+            <button type="button" class="pw-toggle" aria-label="Toggle confirm password">👁</button>
+          </div>
+        </div>
+
+        <!-- Password strength bar -->
+        <div style="margin-bottom:20px;">
+          <div id="strengthBar" style="height:4px;border-radius:4px;background:var(--border);overflow:hidden;margin-bottom:6px;">
+            <div id="strengthFill" style="height:100%;width:0%;transition:width 0.3s,background 0.3s;border-radius:4px;"></div>
+          </div>
+          <p id="strengthLabel" style="font-size:11.5px;color:var(--text-muted);"></p>
+        </div>
+
+        <button type="submit" class="btn-primary" id="registerBtn">
+          <span>Create Account</span>
+        </button>
+
+        <p class="msg error" id="registerMsg"></p>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    // Password strength checker
+    document.getElementById('password').addEventListener('input', function() {
+      const val = this.value;
+      const fill  = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const levels = [
+        { w:'0%',   bg:'transparent', txt:'' },
+        { w:'25%',  bg:'#ff5a5a',     txt:'Weak' },
+        { w:'50%',  bg:'#ffa24d',     txt:'Fair' },
+        { w:'75%',  bg:'#63d2ff',     txt:'Good' },
+        { w:'100%', bg:'#4afa9a',     txt:'Strong' },
+      ];
+      fill.style.width      = levels[score].w;
+      fill.style.background = levels[score].bg;
+      label.textContent     = levels[score].txt;
+      label.style.color     = levels[score].bg;
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName        = document.getElementById('fullName').value.trim();
+      const email           = document.getElementById('email').value.trim();
+      const password        = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const btn             = document.getElementById('registerBtn');
+
+      showMsg('registerMsg', '');
+
+      if (!fullName)                     { showMsg('registerMsg', 'Full name is required.'); return; }
+      if (!email)                        { showMsg('registerMsg', 'Email is required.'); return; }
+      if (password.length < 8)           { showMsg('registerMsg', 'Password must be at least 8 characters.'); return; }
+      if (password !== confirmPassword)  { showMsg('registerMsg', 'Passwords do not match.'); return; }
+
+      setLoading(btn, true);
+      try {
+        const res = await fetch(`${API}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullName, email, password })
+        });
+        const result = await res.text();
+        if (res.ok && result.toLowerCase().includes('success')) {
+          showToast('Account created! Redirecting to login…', 'success');
+          setTimeout(() => window.location.href = 'login.html', 1200);
+        } else {
+          showMsg('registerMsg', result || 'Registration failed. Please try again.');
+        }
+      } catch {
+        showMsg('registerMsg', 'Cannot connect to server. Please try again.');
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

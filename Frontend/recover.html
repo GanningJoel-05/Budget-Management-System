@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password | Budget Management</title>
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-icon">🔒</div>
+        <h1>Reset Password</h1>
+        <p>Choose a strong new password</p>
+      </div>
+
+      <form id="resetForm" novalidate>
+        <div class="field">
+          <label for="newPassword">New Password</label>
+          <div class="field-pw">
+            <input type="password" id="newPassword" placeholder="Min. 8 characters" autocomplete="new-password" />
+            <button type="button" class="pw-toggle" aria-label="Toggle password">👁</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm New Password</label>
+          <div class="field-pw">
+            <input type="password" id="confirmPassword" placeholder="Re-enter new password" autocomplete="new-password" />
+            <button type="button" class="pw-toggle" aria-label="Toggle confirm password">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="resetBtn">
+          <span>Reset Password</span>
+        </button>
+
+        <p class="msg error" id="resetMsg"></p>
+      </form>
+
+      <div class="auth-footer">
+        <a href="login.html">← Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    // Guard: must have come from forgot page
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!localStorage.getItem('recoveryEmail')) {
+        showToast('Please start from the Forgot Password page.', 'error');
+        setTimeout(() => window.location.href = 'forgot.html', 1500);
+      }
+    });
+
+    document.getElementById('resetForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('newPassword').value;
+      const confirm  = document.getElementById('confirmPassword').value;
+      const email    = localStorage.getItem('recoveryEmail');
+      const btn      = document.getElementById('resetBtn');
+      showMsg('resetMsg', '');
+
+      if (!password || !confirm)    { showMsg('resetMsg', 'All fields are required.'); return; }
+      if (password.length < 8)      { showMsg('resetMsg', 'Password must be at least 8 characters.'); return; }
+      if (password !== confirm)     { showMsg('resetMsg', 'Passwords do not match.'); return; }
+
+      setLoading(btn, true);
+      try {
+        const res = await fetch(`${API}/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        if (res.ok) {
+          localStorage.removeItem('recoveryEmail');
+          showToast('Password reset successfully! Redirecting to login…', 'success');
+          setTimeout(() => window.location.href = 'login.html', 1200);
+        } else {
+          showMsg('resetMsg', 'Reset failed. Please try again.');
+        }
+      } catch {
+        showMsg('resetMsg', 'Cannot connect to server. Please try again.');
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

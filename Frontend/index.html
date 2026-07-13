@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Budget Management System</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">💰</div>
+          <div class="brand-text">Budget Pro<small>Management System</small></div>
+        </div>
+      </div>
+      <nav class="nav">
+        <div class="nav-label">Overview</div>
+        <div class="nav-item active" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</div>
+        <div class="nav-label">Transactions</div>
+        <div class="nav-item" data-section="addExpense"><span class="nav-icon">➕</span> Add Expense</div>
+        <div class="nav-item" data-section="addIncome"><span class="nav-icon">💵</span> Add Income</div>
+        <div class="nav-item" data-section="transactions"><span class="nav-icon">📜</span> Transaction History</div>
+        <div class="nav-item" data-section="expenseSummary"><span class="nav-icon">📋</span> Financial Overview</div>
+        <div class="nav-label">Planning</div>
+        <div class="nav-item" data-section="budgetGoals"><span class="nav-icon">🎯</span> Budget & Goals</div>
+        <div class="nav-item" data-section="recurring"><span class="nav-icon">🔁</span> Recurring Expenses</div>
+        <div class="nav-label">Account</div>
+        <div class="nav-item" data-section="profile"><span class="nav-icon">👤</span> My Profile</div>
+        <div class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span> Settings</div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="nav-item logout-item" id="logoutBtn"><span class="nav-icon">🚪</span> Log Out</div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="btn-icon mobile-menu-btn" id="menuToggle">☰</button>
+          <div class="header-left">
+            <h1 id="headerTitle">Dashboard</h1>
+            <p id="headerDate"></p>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="btn-icon" id="exportBtn" title="Export Data">⬇️</button>
+          <button class="btn-icon theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+          <div class="user-chip" id="userChip" onclick="navigateTo('profile', {profile:'My Profile'})" title="View Profile" style="cursor:pointer;">
+            <div class="user-avatar" id="userInitial">U</div>
+            <span id="welcomeUser">User</span>
+          </div>
+        </div>
+      </header>
+
+      <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <div class="mbn-item active" data-section="dashboard"><span>📊</span><small>Dashboard</small></div>
+        <div class="mbn-item" data-section="addExpense"><span>➕</span><small>Expense</small></div>
+        <div class="mbn-item" data-section="addIncome"><span>💵</span><small>Income</small></div>
+        <div class="mbn-item" data-section="transactions"><span>📜</span><small>History</small></div>
+        <div class="mbn-item" data-section="settings"><span>⚙️</span><small>Settings</small></div>
+      </nav>
+
+      <div class="content">
+
+        <!-- Dashboard -->
+        <section class="section active" id="dashboard">
+          <div class="stat-grid">
+            <div class="stat-card c1"><div class="stat-label">Total Expenses</div><div class="stat-value accent" id="totalAmount">₹0.00</div><div class="stat-sub" id="numberOfExpenses">0 transactions</div></div>
+            <div class="stat-card c2"><div class="stat-label">Total Income</div><div class="stat-value warning" id="dashTotalIncome">₹0.00</div><div class="stat-sub">All time</div></div>
+            <div class="stat-card c3"><div class="stat-label">Net Savings</div><div class="stat-value purple" id="dashSavings">₹0.00</div><div class="stat-sub">Income − Expenses</div></div>
+            <div class="stat-card c4"><div class="stat-label">Budget Remaining</div><div class="stat-value green" id="dashBudgetLeft">₹0.00</div><div class="stat-sub">This month</div></div>
+          </div>
+          <div class="chart-grid">
+            <div class="card">
+              <div class="card-title">Monthly Expenses</div>
+              <div class="chart-wrap" style="height:260px;">
+                <canvas id="monthlyChart"></canvas>
+                <div class="empty-state" id="monthlyEmpty" style="display:none;"><div class="empty-icon">📉</div><p>No expense data yet.<br>Add an expense to see the chart.</p></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">By Category</div>
+              <div class="chart-wrap" style="height:200px;">
+                <canvas id="categoryChart"></canvas>
+                <div class="empty-state" id="categoryEmpty" style="display:none;"><div class="empty-icon">🥧</div><p>No categories yet.</p></div>
+              </div>
+              <div class="cat-list" id="categoryList"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Date Range</div>
+            <div class="stat-grid" style="margin-bottom:0;">
+              <div class="stat-card c3"><div class="stat-label">First Expense</div><div class="stat-value" style="font-size:18px;" id="firstExpenseDate">—</div></div>
+              <div class="stat-card c4"><div class="stat-label">Latest Expense</div><div class="stat-value" style="font-size:18px;" id="lastExpenseDate">—</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Add Expense -->
+        <section class="section" id="addExpense">
+          <div class="section-header"><h2>Add Expense</h2><p>Record a new expense to track your spending</p></div>
+          <div class="card form-card">
+            <div class="form-grid">
+              <div class="form-field"><label>Title *</label><input type="text" id="expenseTitle" placeholder="e.g. Groceries" autocomplete="off"/></div>
+              <div class="form-field"><label>Amount (₹) *</label><input type="number" id="expenseAmount" step="0.01" min="0" placeholder="0.00" /></div>
+              <div class="form-field"><label>Date *</label><input type="date" id="expenseDate" /></div>
+              <div class="form-field">
+                <label>Category *</label>
+                <select id="expenseCategory">
+                  <option value="">— Select —</option>
+                  <option value="Food">🍔 Food</option><option value="Rent">🏠 Rent</option>
+                  <option value="Utilities">⚡ Utilities</option><option value="Transportation">🚗 Transportation</option>
+                  <option value="Entertainment">🎬 Entertainment</option><option value="Health">🏥 Health</option>
+                  <option value="Education">📚 Education</option><option value="Shopping">🛍️ Shopping</option>
+                  <option value="Travel">✈️ Travel</option><option value="Other">📦 Other</option>
+                </select>
+              </div>
+              <div class="form-field span2"><label>Description (optional)</label><textarea id="expenseDescription" rows="3" placeholder="Any additional notes…"></textarea></div>
+            </div>
+            <div class="form-actions"><button class="btn-submit" id="saveExpense"><span>Add Expense</span></button></div>
+          </div>
+        </section>
+
+        <!-- Add Income -->
+        <section class="section" id="addIncome">
+          <div class="section-header"><h2>Add Income</h2><p>Record an income source to calculate your savings</p></div>
+          <div class="card form-card">
+            <div class="form-grid">
+              <div class="form-field"><label>Source *</label><input type="text" id="incomeSource" placeholder="e.g. Salary, Freelance" autocomplete="off"/></div>
+              <div class="form-field"><label>Amount (₹) *</label><input type="number" id="incomeAmount" step="0.01" min="0" placeholder="0.00" /></div>
+              <div class="form-field span2"><label>Date *</label><input type="date" id="incomeDate" /></div>
+            </div>
+            <div class="form-actions"><button class="btn-submit" id="saveIncome"><span>Add Income</span></button></div>
+          </div>
+        </section>
+
+        <!-- Transaction History -->
+        <section class="section" id="transactions">
+          <div class="section-header"><h2>Transaction History</h2><p>View, filter, edit and delete all your transactions</p></div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="filter-bar">
+              <div class="form-field" style="flex:2;min-width:160px;"><label>Search</label><input type="text" id="filterSearch" placeholder="Search…" autocomplete="off"/></div>
+              <div class="form-field"><label>Type</label><select id="filterType"><option value="all">All</option><option value="expense">Expenses</option><option value="income">Income</option></select></div>
+              <div class="form-field"><label>Category</label><select id="filterCategory"><option value="all">All</option><option value="Food">Food</option><option value="Rent">Rent</option><option value="Utilities">Utilities</option><option value="Transportation">Transportation</option><option value="Entertainment">Entertainment</option><option value="Health">Health</option><option value="Education">Education</option><option value="Shopping">Shopping</option><option value="Travel">Travel</option><option value="Other">Other</option></select></div>
+              <div class="form-field"><label>From</label><input type="date" id="filterFrom" /></div>
+              <div class="form-field"><label>To</label><input type="date" id="filterTo" /></div>
+              <div class="form-field" style="align-self:flex-end;"><button class="btn-submit" id="clearFilters" style="padding:12px 16px;"><span>Clear</span></button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-header-row">
+              <span id="txCount" class="tx-count">0 transactions</span>
+              <div style="display:flex;gap:10px;">
+                <button class="btn-export" id="exportCSV">📥 CSV</button>
+                <button class="btn-export" id="exportPDF">📄 PDF</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="tx-table"><thead><tr><th>Date</th><th>Title / Source</th><th>Category</th><th>Type</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="txBody"></tbody></table>
+              <div class="empty-state" id="txEmpty" style="display:none;"><div class="empty-icon">🗒️</div><p>No transactions found.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Financial Overview -->
+        <section class="section" id="expenseSummary">
+          <div class="section-header"><h2>Financial Overview</h2><p>Your complete income, expense, and savings breakdown</p></div>
+          <div class="stat-grid">
+            <div class="stat-card c2"><div class="stat-label">Total Income</div><div class="stat-value warning" id="summaryTotalIncome">₹0.00</div></div>
+            <div class="stat-card c1"><div class="stat-label">Total Expenses</div><div class="stat-value accent" id="summaryTotalExpenses">₹0.00</div></div>
+            <div class="stat-card c4"><div class="stat-label">Net Savings</div><div class="stat-value green" id="summarySavings">₹0.00</div></div>
+          </div>
+        </section>
+
+        <!-- Budget & Goals -->
+        <section class="section" id="budgetGoals">
+          <div class="section-header"><h2>Budget & Goals</h2><p>Set and monitor your monthly spending budget</p></div>
+          <div class="card form-card">
+            <div class="card-title">Set Monthly Budget</div>
+            <div class="form-grid"><div class="form-field"><label>Budget Amount (₹)</label><input type="number" id="monthlyBudget" step="0.01" min="0" placeholder="e.g. 20000" /></div></div>
+            <div class="form-actions"><button class="btn-submit" id="setBudget"><span>Save Budget</span></button></div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card c2"><div class="stat-label">Monthly Income</div><div class="stat-value warning" id="currentMonthlyIncome">₹0.00</div></div>
+            <div class="stat-card c1"><div class="stat-label">Monthly Expenses</div><div class="stat-value accent" id="currentMonthlyExpenses">₹0.00</div></div>
+            <div class="stat-card c3"><div class="stat-label">Budget Set</div><div class="stat-value purple" id="displayBudget">₹0.00</div></div>
+            <div class="stat-card c4" id="budgetRemainingCard"><div class="stat-label">Remaining</div><div class="stat-value green" id="budgetRemaining">₹0.00</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Budget Used This Month</div>
+            <div class="budget-bar-wrap">
+              <div class="budget-bar-meta"><span id="budgetUsedPct">0% used</span><span id="budgetUsedAmt">₹0 / ₹0</span></div>
+              <div class="budget-bar"><div class="budget-bar-fill" id="budgetBarFill" style="width:0%;"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recurring Expenses -->
+        <section class="section" id="recurring">
+          <div class="section-header"><h2>Recurring Expenses</h2><p>Auto-add monthly expenses on a set day each month</p></div>
+          <div class="card form-card">
+            <div class="card-title">Add Recurring Expense</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Title *</label><input type="text" id="recurTitle" placeholder="e.g. Netflix, Rent" autocomplete="off"/></div>
+              <div class="form-field"><label>Amount (₹) *</label><input type="number" id="recurAmount" step="0.01" min="0" placeholder="0.00" /></div>
+              <div class="form-field">
+                <label>Category *</label>
+                <select id="recurCategory">
+                  <option value="">— Select —</option>
+                  <option value="Food">🍔 Food</option><option value="Rent">🏠 Rent</option>
+                  <option value="Utilities">⚡ Utilities</option><option value="Transportation">🚗 Transportation</option>
+                  <option value="Entertainment">🎬 Entertainment</option><option value="Health">🏥 Health</option>
+                  <option value="Education">📚 Education</option><option value="Shopping">🛍️ Shopping</option>
+                  <option value="Travel">✈️ Travel</option><option value="Other">📦 Other</option>
+                </select>
+              </div>
+              <div class="form-field"><label>Day of Month (1-28)</label><input type="number" id="recurDay" min="1" max="28" placeholder="e.g. 1" /></div>
+              <div class="form-field span2"><label>Description (optional)</label><input type="text" id="recurDesc" placeholder="e.g. Monthly subscription" autocomplete="off"/></div>
+            </div>
+            <div class="form-actions"><button class="btn-submit" id="saveRecurring"><span>Add Recurring</span></button></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Active Recurring Expenses</div>
+            <div id="recurringList"><div class="empty-state" id="recurEmpty"><div class="empty-icon">🔁</div><p>No recurring expenses yet.</p></div></div>
+          </div>
+        </section>
+
+        <!-- Settings -->
+        <section class="section" id="settings">          <div class="section-header"><h2>Settings</h2><p>Manage your account and preferences</p></div>
+          <div class="card profile-card" style="margin-bottom:16px;">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar" id="profileAvatar">U</div>
+              <label class="avatar-upload-btn" for="avatarInput" title="Change photo">📷</label>
+              <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+            </div>
+            <div class="profile-info">
+              <div class="profile-name" id="profileName">User</div>
+              <div class="profile-email" id="profileEmail">—</div>
+              <div class="profile-badge">Active Account</div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">Account Information</div>
+            <div class="settings-grid">
+              <div class="settings-item"><div class="settings-label">Full Name</div><div class="settings-value" id="userFullName">—</div></div>
+              <div class="settings-item"><div class="settings-label">Email</div><div class="settings-value" id="userEmail">—</div></div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">Preferences</div>
+            <div class="settings-grid">
+              <div class="settings-item"><div class="settings-label">Theme</div><div class="settings-value"><button class="btn-submit" style="font-size:13px;padding:9px 18px;" id="themeSettingBtn"><span id="themeSettingLabel">Switch to Light</span></button></div></div>
+              <div class="settings-item"><div class="settings-label">Currency</div><div class="settings-value">₹ Indian Rupee (INR)</div></div>
+            </div>
+          </div>
+          <div class="card danger-zone">
+            <div class="card-title" style="color:var(--danger);">Danger Zone</div>
+            <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:16px;">Permanently log out and clear your local session data.</p>
+            <button class="btn-danger" id="logoutBtnSettings">Log Out</button>
+          </div>
+        </section>
+
+        <!-- Profile -->
+        <section class="section" id="profile">
+          <div class="section-header"><h2>My Profile</h2><p>View and manage your personal information</p></div>
+          <div class="card profile-hero-card" style="margin-bottom:16px;">
+            <div class="profile-hero-left">
+              <div class="profile-avatar-wrap">
+                <div class="profile-avatar-lg" id="profileAvatarLg">U</div>
+                <label class="avatar-upload-btn-lg" for="avatarInputProfile" title="Change photo">📷</label>
+                <input type="file" id="avatarInputProfile" accept="image/*" style="display:none;" />
+              </div>
+              <div class="profile-hero-info">
+                <div class="profile-hero-name" id="profileHeroName">User</div>
+                <div class="profile-hero-email" id="profileHeroEmail">—</div>
+                <span class="profile-badge">✓ Active Account</span>
+              </div>
+            </div>
+            <button class="btn-avatar-remove" id="removeAvatarBtn" style="display:none;">🗑️ Remove Photo</button>
+          </div>
+          <div class="stat-grid" style="margin-bottom:16px;">
+            <div class="stat-card c2"><div class="stat-label">Total Income</div><div class="stat-value warning" id="profileTotalIncome">₹0.00</div></div>
+            <div class="stat-card c1"><div class="stat-label">Total Expenses</div><div class="stat-value accent" id="profileTotalExpenses">₹0.00</div></div>
+            <div class="stat-card c4"><div class="stat-label">Net Savings</div><div class="stat-value green" id="profileSavings">₹0.00</div></div>
+            <div class="stat-card c3"><div class="stat-label">Transactions</div><div class="stat-value purple" id="profileTxCount">0</div></div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">Account Details</div>
+            <div class="profile-details-grid">
+              <div class="profile-detail-item"><div class="profile-detail-label">Full Name</div><div class="profile-detail-value" id="profileDetailName">—</div></div>
+              <div class="profile-detail-item"><div class="profile-detail-label">Email Address</div><div class="profile-detail-value" id="profileDetailEmail">—</div></div>
+              <div class="profile-detail-item"><div class="profile-detail-label">Member Since</div><div class="profile-detail-value" id="profileMemberSince">—</div></div>
+              <div class="profile-detail-item"><div class="profile-detail-label">Monthly Budget</div><div class="profile-detail-value" id="profileBudget">Not set</div></div>
+            </div>
+          </div>
+          <div class="card danger-zone">
+            <div class="card-title" style="color:var(--danger);">Session</div>
+            <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:16px;">Log out of your current session.</p>
+            <button class="btn-danger" onclick="doLogout()">🚪 Log Out</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Edit Transaction</h3>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editId" /><input type="hidden" id="editType" />
+        <div class="form-grid">
+          <div class="form-field" id="editTitleWrap"><label>Title</label><input type="text" id="editTitle" autocomplete="off"/></div>
+          <div class="form-field" id="editSourceWrap"><label>Source</label><input type="text" id="editSource" autocomplete="off"/></div>
+          <div class="form-field"><label>Amount (₹)</label><input type="number" id="editAmount" step="0.01" min="0" /></div>
+          <div class="form-field"><label>Date</label><input type="date" id="editDate" /></div>
+          <div class="form-field" id="editCategoryWrap"><label>Category</label>
+            <select id="editCategory">
+              <option value="Food">Food</option><option value="Rent">Rent</option><option value="Utilities">Utilities</option>
+              <option value="Transportation">Transportation</option><option value="Entertainment">Entertainment</option>
+              <option value="Health">Health</option><option value="Education">Education</option>
+              <option value="Shopping">Shopping</option><option value="Travel">Travel</option><option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-danger" id="modalCancel">Cancel</button>
+        <button class="btn-submit" id="modalSave"><span>Save Changes</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
